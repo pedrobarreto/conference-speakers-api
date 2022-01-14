@@ -1,12 +1,22 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const crypto = require('crypto');
 
 const app = express();
 app.use(bodyParser.json());
 
 const HTTP_OK_STATUS = 200;
 const HTTP_ERROR_STATUS = 404;
+const HTTP_BAD_STATUS = 400;
 const PORT = '3000';
+
+function generateToken() {
+ return crypto.randomBytes(8).toString('hex');
+}
+
+// onde aprendi sobre o modulo email validator do node 
+// https://stackoverflow.com/questions/52456065/how-to-format-and-validate-email-node-js
+const validator = require('email-validator');
 
 const fs = require('fs/promises');
 
@@ -37,6 +47,32 @@ app.get('/talker/:id', async (req, res) => {
 }
 
   res.status(HTTP_OK_STATUS).json(talkerId);
+});
+
+function validateMail(req, res, next) {
+  const { email } = req.body;
+  if ([email].includes(undefined) || email.length === 0) {
+    return res.status(HTTP_BAD_STATUS).json({ message: 'O campo "email" é obrigatório' });
+  }
+  if (!validator.validate(email)) {
+    return res.status(HTTP_BAD_STATUS)
+    .json({ message: 'O "email" deve ter o formato "email@email.com"' });
+  }
+  next();
+}
+
+app.post('/login', validateMail, async (req, res) => {
+  const { password } = req.body;
+  const token = await generateToken();
+
+  if ([password].includes(undefined) || password.length === 0) {
+    return res.status(HTTP_BAD_STATUS).json({ message: 'O campo "password" é obrigatório' });
+  }
+  if (password.length < 6) {
+    return res.status(HTTP_BAD_STATUS)
+    .json({ message: 'O "password" deve ter pelo menos 6 caracteres' });
+  }
+  res.status(HTTP_OK_STATUS).json({ token });
 });
 
 app.listen(PORT, () => {
