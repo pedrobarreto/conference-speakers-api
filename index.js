@@ -6,6 +6,7 @@ const app = express();
 app.use(bodyParser.json());
 
 const HTTP_OK_STATUS = 200;
+const HTTP_NOCONTENT_STATUS = 204;
 const HTTP_CREATED_STATUS = 201;
 const HTTP_ERROR_STATUS = 404;
 const HTTP_BAD_STATUS = 400;
@@ -87,6 +88,15 @@ app.put('/talker/:id', validateAuth, validateName,
   talkers[talker] = ({ name, age, id: 5, talk });
   await setTalkers(talkers);
   res.status(HTTP_OK_STATUS).json(talkers[talkers.length - 1]);
+});
+
+app.delete('/talker/:id', validateAuth, async (req, res) => {
+  const talkers = await getTalkers();
+  const { id } = req.params;
+  const talker = talkers.findIndex((person) => person.id === +id);
+  talkers.splice(talker, 1);
+  await setTalkers(talkers);
+  res.status(HTTP_NOCONTENT_STATUS).json(talkers[talkers.length - 1]);
 });
 
 app.listen(PORT, () => {
