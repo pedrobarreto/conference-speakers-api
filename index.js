@@ -36,6 +36,17 @@ app.get('/', (_request, response) => {
   response.status(HTTP_OK_STATUS).send();
 });
 
+app.get('/talker/search', validateAuth, async (req, res) => {
+  const talkers = await getTalkers();
+ const { q } = req.query;
+  const filteredTalker = talkers.filter((talker) => talker.name.includes(q));
+
+  if ([q].includes(undefined) || q.length === 0) {
+    return res.status(HTTP_OK_STATUS).json(talkers);
+  }
+  res.status(HTTP_OK_STATUS).json(filteredTalker);
+});
+
 app.get('/talker', async (req, res) => {
   const talkers = await getTalkers();
  if (talkers.length === 0) return res.status(HTTP_OK_STATUS).json([]);
