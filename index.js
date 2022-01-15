@@ -71,12 +71,22 @@ app.post('/login', validateMail, async (req, res) => {
 app.post('/talker', validateAuth, validateName,
  validateDate, validateAge, validateRate, async (req, res) => {
   const talkers = await getTalkers();
+  const id = talkers.length + 1;
   const { name, age, talk } = req.body;
-
-  talkers.push({ age, id: 5, name, talk });
+  talkers.push({ name, age, id, talk });
   await setTalkers(talkers);
-  res.status(HTTP_CREATED_STATUS).json(talkers[talkers.length - 1]);
-  console.log(talk);
+  res.status(HTTP_CREATED_STATUS).json(talkers[id - 1]);
+});
+
+app.put('/talker/:id', validateAuth, validateName,
+ validateDate, validateAge, validateRate, async (req, res) => {
+  const talkers = await getTalkers();
+  const { name, age, talk } = req.body;
+  const { id } = req.params;
+  const talker = talkers.findIndex((person) => person.id === +id);
+  talkers[talker] = ({ name, age, id: 5, talk });
+  await setTalkers(talkers);
+  res.status(HTTP_OK_STATUS).json(talkers[talkers.length - 1]);
 });
 
 app.listen(PORT, () => {
