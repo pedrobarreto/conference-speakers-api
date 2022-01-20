@@ -71,7 +71,7 @@ router
   const { name, age, talk } = req.body;
   const { id } = req.params;
   const talker = talkers.findIndex((person) => person.id === +id);
-  talkers[talker] = ({ name, age, id: 5, talk });
+  talkers[talker] = ({ name, age, id: +id, talk });
   await setTalkers(talkers);
   res.status(HTTP_OK_STATUS).json(talkers[talkers.length - 1]);
 })
