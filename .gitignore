@@ -293,4 +293,4 @@ $RECYCLE.BIN/
 trybe.yml
 .github/*
 .trybe/*
-tests
+/tests
