@@ -294,3 +294,5 @@ trybe.yml
 .github/*
 .trybe/*
 /tests
+/.trybe
+/.github
